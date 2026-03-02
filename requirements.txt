@@ -1,2 +1,4 @@
--r unfair_tos_web/requirements.txt
+flask>=3.0
+requests>=2.31
+beautifulsoup4>=4.12
 gunicorn>=21.2
