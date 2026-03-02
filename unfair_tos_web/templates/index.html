@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ToS Fairness Checker (LegalBench unfair_tos)</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <main class="wrap">
+      <h1>ToS Fairness Checker</h1>
+      <p class="sub">Classifies clauses using LegalBench <code>unfair_tos</code> categories.</p>
+
+      <form method="post" class="card">
+        <label for="url">Website URL</label>
+        <input id="url" name="url" type="text" placeholder="example.com" required />
+        <button type="submit">Analyze Terms</button>
+      </form>
+
+      {% if error %}
+      <section class="card err">{{ error }}</section>
+      {% endif %}
+
+      {% if result %}
+      <section class="card">
+        <h2>Verdict: <span class="{{ 'bad' if result.verdict == 'Unfair' else 'ok' }}">{{ result.verdict }}</span></h2>
+        <p><strong>Analyzed page:</strong> <a href="{{ source_url }}" target="_blank">{{ source_url }}</a></p>
+        {% if note %}<p class="note">{{ note }}</p>{% endif %}
+        <p>
+          <strong>Flagged unfair clauses:</strong> {{ result.unfair_count }}
+          / {{ result.total_clauses }} clauses
+        </p>
+
+        <h3>Category counts</h3>
+        <ul>
+          {% for label, count in result.category_counts.items() %}
+          <li><strong>{{ label }}</strong>: {{ count }}</li>
+          {% endfor %}
+          {% if not result.category_counts %}
+          <li>No unfair-category matches detected.</li>
+          {% endif %}
+        </ul>
+      </section>
+
+      <section class="card">
+        <h3>Flagged clauses (evidence)</h3>
+        {% for item in result.flagged %}
+        <article class="clause">
+          <div class="tag">{{ item.category }}</div>
+          <p>{{ item.text }}</p>
+        </article>
+        {% endfor %}
+        {% if not result.flagged %}
+        <p>No clauses matched the unfair categories.</p>
+        {% endif %}
+      </section>
+      {% endif %}
+    </main>
+  </body>
+</html>
